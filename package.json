@@ -10,8 +10,6 @@
     "grpc-graphsearch-node": "^0.1.4",
     "node-fetch": "^2.6.0",
     "protons": "^1.2.1",
-    "slp-validate": "^1.2.1",
-    "synchronized-promise": "^0.3.1",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
   },
