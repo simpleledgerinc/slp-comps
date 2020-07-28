@@ -1,0 +1,25 @@
+{
+  "name": "slp-comps",
+  "version": "1.0.0",
+  "description": "Compare slp validation results between different indexer implementations",
+  "main": "index.ts",
+  "dependencies": {
+    "@types/node-fetch": "^2.5.7",
+    "dotenv": "^8.2.0",
+    "grpc-bchrpc-node": "git://github.com/simpleledgerinc/grpc-bchrpc-node.git#slp",
+    "grpc-graphsearch-node": "^0.1.4",
+    "node-fetch": "^2.6.0",
+    "protons": "^1.2.1",
+    "slp-validate": "^1.2.1",
+    "synchronized-promise": "^0.3.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "npx ts-node ./src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "James Cramer",
+  "license": "ISC"
+}
