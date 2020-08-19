@@ -34,6 +34,9 @@ class _SlpdbClient implements SlpIndexerClient {
         const b64 = Buffer.from(JSON.stringify(query)).toString("base64");
         const res: { c: any[]; u: any[]; } = await (await fetch(process.env.SLPDB_URL + b64)).json();
         let obj: any;
+        while (! res.c || ! res.u) {
+            throw Error(`SLPDB slpserve response failed for ${txid}.  Make sure to disable the server's rate limiter.`);
+        }
         if (res.c.length === 0 && res.u.length === 0) {
             console.log(`SLPDB record is missing (${txid})`);
             return false;

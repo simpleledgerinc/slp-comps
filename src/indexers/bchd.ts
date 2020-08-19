@@ -1,4 +1,4 @@
-import { GetTrustedValidationResponse, GrpcClient } from "grpc-bchrpc-node";
+import { GetTrustedSlpValidationResponse, GrpcClient } from "grpc-bchrpc-node";
 import { SlpIndexerClient } from "../interface";
 
 class _BchdClient implements SlpIndexerClient {
@@ -7,12 +7,18 @@ class _BchdClient implements SlpIndexerClient {
     }
     private static _instance: _BchdClient;
 
-    private client = new GrpcClient({ url: process.env.BCHD_GRPC_URL, rootCertPath: process.env.BCHD_GRPC_CERT });
+    private client = new GrpcClient({
+        url: process.env.BCHD_GRPC_URL,
+        rootCertPath: process.env.BCHD_GRPC_CERT
+    });
 
     public async validity(txid: string): Promise<boolean> {
-        let res: GetTrustedValidationResponse;
+        let res: GetTrustedSlpValidationResponse;
         try {
-            res = await this.client.getTrustedValidation({ txos: [{ hash: txid, vout: 1 }], reversedHashOrder: true });
+            res = await this.client.getTrustedSlpValidation({
+                txos: [{ hash: txid, vout: 1 }],
+                reversedHashOrder: true,
+            });
         } catch (err) {
             if (err.message.includes("slp output index cannot be 0 or > 19")) {
                 return true;
