@@ -9,7 +9,10 @@ class _Logger {
     constructor() {}
 
     addInvalid(indexerName: string, txidHex: string) {
-        fs.appendFileSync(`MISMATCHES-${indexerName}.txt`, `${txidHex}\n`);
+        const fileName = `MISMATCHES-${indexerName}.txt`;
+        console.log(`[WARN] Judgement mismatch for ${txidHex} with indexer named "${indexerName}"`);
+        fs.appendFileSync(fileName, `${txidHex}\n`);
+        console.log(`[WARN] Logged mismatch to ${fileName}`);
     }
 
 }
