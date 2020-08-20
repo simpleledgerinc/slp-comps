@@ -2,7 +2,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import fs from "fs";
-//import { SlpIndexerClient } from "./interface";
 
 const protons = require("protons");
 const pb = protons(`

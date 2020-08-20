@@ -9,6 +9,7 @@ import { BchdClient } from "./indexers/bchd";
 import { BitcoinComSlpIdexerClient } from "./indexers/bitcoincom";
 import { GsppTrustedValidationClient } from "./indexers/gs++tv";
 import { SlpdbClient } from "./indexers/slpdb";
+import { Logger } from "./log";
 
 if (!process.env.BCHD_GRPC_URL) {
     throw Error("missing environment variable 'BCHD_GRPC_URL' for connecting to BCHD, see README for setup instructions.");
@@ -46,8 +47,16 @@ const client = new GrpcClient({
     rootCertPath: process.env.BCHD_GRPC_CERT
 });
 
+const args = process.argv;
+
+// by default the program quits when a indexer mismatch is found,
+// use "--log-errors" to optionally log the errors and continue past the mismatch
+let throwOnError = true;
+if (args.find((a) => a === "--log-errors")) {
+    throwOnError = false;
+}
+
 const main = async () => {
-    const args = process.argv;
 
     // compare all slp transactions since genesis
     if (! args.find((a) => a === "--nosync")) {
@@ -115,7 +124,12 @@ const compareIndexersForBlock = async (blockIndex: number) => {
                 if (!currHeight || currHeight < blockIndex || idxr.indexerName().includes("bchd")) {
                     const _val = await idxr.validity(txid);
                     if (validity !== null && _val !== validity) {
-                        throw Error(`Judgement mismatch for ${txid} with indexer named "${idxr.indexerName()}"`);
+                        if (throwOnError) {
+                            throw Error(`Judgement mismatch for ${txid} with indexer named "${idxr.indexerName()}"`);
+                        } else {
+                            Logger.addInvalid(idxr.indexerName(), txid);
+                        }
+
                     } else {
                         validity = _val;
                     }
