@@ -71,6 +71,9 @@ const main = async () => {
                 console.log(`Progress at ${lowestHeight}.`);
                 console.log(`Total SLP transactions checked: ${PbCache.totalChecked}`);
                 console.log(`Total SLP transactions valid: ${PbCache.totalValid}`);
+                indexers.forEach((idxr, _) => {
+                    console.log(`Indexer "${idxr.indexerName()}" last checked txid at block: ${PbCache.indexerList.get(idxr.indexerName())}`);
+                });
                 console.log(`---------------------------------------------------------------`);
             }
 
