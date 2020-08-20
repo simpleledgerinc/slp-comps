@@ -8,13 +8,15 @@ import { SlpIndexerClient } from "./interface";
 import { BchdClient } from "./indexers/bchd";
 import { GsppTrustedValidationClient } from "./indexers/gs++tv";
 import { SlpdbClient } from "./indexers/slpdb";
+import { BitcoinComSlpIdexerClient } from "./indexers/bitcoincomslpindexer";
 
 const client = new GrpcClient({ url: process.env.BCHD_GRPC_URL, rootCertPath: process.env.BCHD_GRPC_CERT });
 
 const indexers: SlpIndexerClient[] = [
     BchdClient,
     SlpdbClient,
-    GsppTrustedValidationClient
+    GsppTrustedValidationClient,
+    BitcoinComSlpIdexerClient
  ];
 
 const main = async () => {
