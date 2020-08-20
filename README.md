@@ -6,10 +6,10 @@ Currently this project provides consistency checks between the following SLP ind
 * [SLPDB](https://github.com/simpleledger/slpdb)
 * [gs++ Trusted Validation](https://github.com/blockparty-sh/cpp_slp_graph_search)
 * [BCHD slp-index branch](https://github.com/simpleledgerinc/bchd/tree/slp-index)
+* [bitcoin.com indexer](https://github.com/Bitcoin-com/slp-indexer)
 
 Adding additional indexers to the consistency checking is as simple as implementing the `SlpIndexerClient` interface similar to the existing indexers and adding any necessary `.env` variables.  In the future the following SLP indexers can also be added to this project if necessary:
 * [Bitcoin Verde](https://github.com/softwareverde/bitcoin-verde)
-* [slp-indexer](https://github.com/Bitcoin-com/slp-indexer)
 * [Electron Cash SLP](https://github.com/simpleledger/electron-cash-slp) (technically EC is not an indexer, adding to this project may significantly degrade performance)
 
 
@@ -43,6 +43,10 @@ Next, rename the file named `example.env` to `.env`, and update the values using
 
 * `GS_GRPC_URL`     - leave blank to default to `gs.fountainhead.cash:50051`
 * `GS_GRPC_CERT`    - optional
+
+**bitcoin.com `.env` variables**
+
+* `BITCOINCOM_URL`  - ex. `localhost:5000`
 
 **slp-comp `.env` variables**
 
