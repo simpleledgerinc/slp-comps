@@ -7,17 +7,17 @@ class _BitcoinComSlpIndexerClient implements SlpIndexerClient {
     }
     private static _instance: _BitcoinComSlpIndexerClient;
 
-    public async validity(txid: string): Promise<boolean> {
+    public async validity(txid: string): Promise<{ validity: boolean, invalidReason?: string }> {
         const res = await (await fetch(process.env.BITCOINCOM_URL + txid)).json();
         if (! res.valid) {
             throw Error(`Bitcoin.com API response failed for ${res.txid} .`);
         }
 
         if (res.valid === "VALID") {
-            return true;
+            return { validity: true };
         } else {
             console.log(`Bitcoin.com judgement: ${res.reason} (${res.txid})`);
-            return false;
+            return { validity: false, invalidReason: res.reason };
         }
     }
 

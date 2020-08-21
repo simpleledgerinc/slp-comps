@@ -12,7 +12,7 @@ class _BchdClient implements SlpIndexerClient {
         rootCertPath: process.env.BCHD_GRPC_CERT
     });
 
-    public async validity(txid: string): Promise<boolean> {
+    public async validity(txid: string): Promise<{ validity: boolean, invalidReason?: string }> {
         let res: GetTrustedSlpValidationResponse;
         try {
             res = await this.client.getTrustedSlpValidation({
@@ -21,15 +21,15 @@ class _BchdClient implements SlpIndexerClient {
             });
         } catch (err) {
             if (err.message.includes("slp output index cannot be 0 or > 19")) {
-                return true;
+                return { validity: true };
             }
             console.log(`BCHD judgement: ${err.message}`);
-            return false;
+            return { validity: false, invalidReason: err.message };
         }
         // console.log(`Token amount: ${res.getResultsList()[0].getV1TokenAmount()}`);
         // console.log(`Mint baton: ${res.getResultsList()[0].getV1MintBaton()}`);
         // console.log(`SLP Msg: ${Buffer.from(res.getResultsList()[0].getSlpTxnOpreturn()).toString("hex")}`)
-        return true;
+        return { validity: true };
     }
 
     public indexerName() {

@@ -7,7 +7,7 @@ class _SlpdbClient implements SlpIndexerClient {
     }
     private static _instance: _SlpdbClient;
 
-    public async validity(txid: string): Promise<boolean> {
+    public async validity(txid: string): Promise<{ validity: boolean, invalidReason?: string }> {
 
         const query = {
             v: 3,
@@ -39,7 +39,7 @@ class _SlpdbClient implements SlpIndexerClient {
         }
         if (res.c.length === 0 && res.u.length === 0) {
             console.log(`SLPDB record is missing (${txid})`);
-            return false;
+            return { validity: false, invalidReason: "record is missing" };
         } else if (res.c.length > 0) {
             obj = res.c[0];
         } else if (res.u.length > 0) {
@@ -47,10 +47,10 @@ class _SlpdbClient implements SlpIndexerClient {
         }
 
         if (obj.slp.valid === true) {
-            return true;
+            return { validity: true };
         } else {
             console.log(`SLPDB judgement: ${obj.slp.invalidReason} (${txid})`);
-            return false;
+            return { validity: false, invalidReason: obj.slp.invalidReason };
         }
     }
 

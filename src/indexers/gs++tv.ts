@@ -21,10 +21,15 @@ class _GsppTrustedValidationClient implements SlpIndexerClient {
         }
     }
 
-    public async validity(txid: string): Promise<boolean> {
+    public async validity(txid: string): Promise<{ validity: boolean, invalidReason?: string }> {
         let res: TrustedValidationReply;
         res = await this.client.trustedValidationFor({ hash: txid, reversedHashOrder: true });
-        return res.getValid();
+        const valid = res.getValid();
+        if (valid) {
+            return { validity: true };
+        } else {
+            return { validity: false, invalidReason: "(response missing invalid reason)" };
+        }
     }
 
     public indexerName() {

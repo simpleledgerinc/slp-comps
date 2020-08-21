@@ -8,10 +8,13 @@ class _Logger {
 
     constructor() {}
 
-    addInvalid(indexerName: string, txidHex: string) {
+    public AddMismatch(indexerName: string, txidHex: string, shouldBeValid: boolean, invalidReason: string) {
         const fileName = `MISMATCHES-${indexerName}.txt`;
         console.log(`[WARN] Judgement mismatch for ${txidHex} with indexer named "${indexerName}"`);
-        fs.appendFileSync(fileName, `${txidHex}\n`);
+        fs.appendFileSync(
+            fileName,
+            `${txidHex} (should be ${shouldBeValid ? "valid" : "invalid"}${invalidReason ? ` cause: ${invalidReason}` : ""})\n`
+        );
         console.log(`[WARN] Logged mismatch to ${fileName}`);
     }
 

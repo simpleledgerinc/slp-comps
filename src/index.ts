@@ -123,15 +123,21 @@ const compareIndexersForBlock = async (blockIndex: number) => {
                 const currHeight = PbCache.indexerList.get(idxr.indexerName())!;
                 if (!currHeight || currHeight < blockIndex || idxr.indexerName().includes("bchd")) {
                     const _val = await idxr.validity(txid);
-                    if (validity !== null && _val !== validity) {
+
+                    let invalidReason = "";
+                    if (idxr.indexerName().includes("bchd") && _val.validity === false) {
+                        invalidReason = _val.invalidReason!;
+                    }
+
+                    if (validity !== null && _val.validity !== validity) {
                         if (throwOnError) {
                             throw Error(`Judgement mismatch for ${txid} with indexer named "${idxr.indexerName()}"`);
                         } else {
-                            Logger.addInvalid(idxr.indexerName(), txid);
+                            Logger.AddMismatch(idxr.indexerName(), txid, validity, invalidReason);
                         }
 
                     } else {
-                        validity = _val;
+                        validity = _val.validity;
                     }
                     indexersUsed.add(idxr.indexerName());
                 }
