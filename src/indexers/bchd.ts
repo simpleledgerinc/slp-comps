@@ -26,9 +26,6 @@ class _BchdClient implements SlpIndexerClient {
             console.log(`BCHD judgement: ${err.message}`);
             return { validity: false, invalidReason: err.message };
         }
-        // console.log(`Token amount: ${res.getResultsList()[0].getV1TokenAmount()}`);
-        // console.log(`Mint baton: ${res.getResultsList()[0].getV1MintBaton()}`);
-        // console.log(`SLP Msg: ${Buffer.from(res.getResultsList()[0].getSlpTxnOpreturn()).toString("hex")}`)
         return { validity: true };
     }
 
