@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { GrpcClient } from "grpc-bchrpc-node";
+import { GrpcClient, SlpAction } from "grpc-bchrpc-node";
 import { PbCache } from "./cache";
 import { SlpIndexerClient } from "./interface";
 
@@ -100,7 +100,7 @@ const main = async () => {
         // TODO... listen for new blocks
     }
 
-    console.log("exiting.");
+    console.log("slp-comps has caught up to tip, exiting.");
 };
 
 const compareIndexersForBlock = async (blockIndex: number) => {
@@ -114,11 +114,31 @@ const compareIndexersForBlock = async (blockIndex: number) => {
     for (const txn of block) {
         const txid = Buffer.from(txn.getTransaction()!.getHash_asU8().slice().reverse()).toString("hex");
         const slpMsgBuf = txn.getTransaction()!.getOutputsList()[0].getPubkeyScript_asU8();
-        if (hasSlpLokadId(slpMsgBuf)) {
+        if (hasSlpId(slpMsgBuf)) {
             hadAnySlp = true;
             console.log(`checking txid: ${txid}`);
             PbCache.totalChecked++;
             let validity: boolean|null = null;
+
+            // logging for burn flag instances
+            const slpInfo = txn.getTransaction()!.getSlpTransactionInfo();
+            if (slpInfo!.getBurnFlagsList().length > 0) {
+                const flags = slpInfo!.getBurnFlagsList();
+                for (const flag of flags) {
+                    Logger.AddBurnCase(flag, txid);
+                    if (flag === 3 && slpInfo!.getSlpAction() === SlpAction.SLP_V1_GENESIS) {
+                        if (slpInfo?.getV1Genesis()!.getMintBatonVout()! > txn.getTransaction()!.getOutputsList().length-1)  {
+                            Logger.AddBurnedMintBatonCase(slpInfo!.getSlpAction(), txid);
+                        }
+                    }
+                    if (flag === 3 && slpInfo!.getSlpAction() === SlpAction.SLP_V1_MINT) {
+                        if (slpInfo?.getV1Genesis()!.getMintBatonVout()! > txn.getTransaction()!.getOutputsList().length-1)  {
+                            Logger.AddBurnedMintBatonCase(slpInfo!.getSlpAction(), txid);
+                        }
+                    }
+                }
+            }
+
             for (const idxr of indexers) {
                 const currHeight = PbCache.indexerList.get(idxr.indexerName())!;
                 if (!currHeight || currHeight < blockIndex || idxr.indexerName().includes("bchd")) {
@@ -163,7 +183,7 @@ const compareIndexersForBlock = async (blockIndex: number) => {
     });
 };
 
-const hasSlpLokadId = (scriptPubKey: Uint8Array): boolean => {
+const hasSlpId = (scriptPubKey: Uint8Array): boolean => {
     const slpLokadIdHex = "534c5000";
     return Buffer.from(scriptPubKey).includes(Buffer.from(slpLokadIdHex, "hex"));
 };
