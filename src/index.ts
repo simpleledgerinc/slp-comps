@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { GrpcClient, SlpAction } from "grpc-bchrpc-node";
+import { GrpcClient, SlpAction, SlpTransactionInfo } from "grpc-bchrpc-node";
 import { PbCache } from "./cache";
 import { SlpIndexerClient } from "./interface";
 
@@ -122,18 +122,34 @@ const compareIndexersForBlock = async (blockIndex: number) => {
 
             // logging for burn flag instances
             const slpInfo = txn.getTransaction()!.getSlpTransactionInfo();
+            const slpAction = slpInfo!.getSlpAction()!;
+            const isValidSlp = slpInfo!.getValidityJudgement() === SlpTransactionInfo.ValidityJudgement.VALID
             if (slpInfo!.getBurnFlagsList().length > 0) {
                 const flags = slpInfo!.getBurnFlagsList();
                 for (const flag of flags) {
-                    Logger.AddBurnCase(flag, txid);
-                    if (flag === 3 && slpInfo!.getSlpAction() === SlpAction.SLP_V1_GENESIS) {
-                        if (slpInfo?.getV1Genesis()!.getMintBatonVout()! > txn.getTransaction()!.getOutputsList().length-1)  {
-                            Logger.AddBurnedMintBatonCase(slpInfo!.getSlpAction(), txid);
-                        }
+
+                    // we'll ignore NFT group token burns for NFT children
+                    if (flag === SlpTransactionInfo.BurnFlags.BURNED_INPUTS_OTHER_TOKEN &&
+                        slpAction === SlpAction.SLP_NFT1_UNIQUE_CHILD_GENESIS &&
+                        isValidSlp &&
+                        txn.getTransaction()!.getInputsList().filter(i => i.getSlpToken() ? true : false).length === 1) {
+                            continue;
                     }
-                    if (flag === 3 && slpInfo!.getSlpAction() === SlpAction.SLP_V1_MINT) {
-                        if (slpInfo?.getV1Genesis()!.getMintBatonVout()! > txn.getTransaction()!.getOutputsList().length-1)  {
-                            Logger.AddBurnedMintBatonCase(slpInfo!.getSlpAction(), txid);
+
+                    Logger.AddBurnCase(flag, txid);
+                    if (flag === SlpTransactionInfo.BurnFlags.BURNED_OUTPUTS_MISSING_BCH_VOUT) {
+                        const maxOutputIndex = txn.getTransaction()!.getOutputsList().length-1
+                        switch (slpInfo!.getSlpAction()) {
+                        case SlpAction.SLP_V1_GENESIS:
+                            if (slpInfo?.getV1Genesis()!.getMintBatonVout()! > maxOutputIndex)  {
+                                Logger.AddBurnedMintBatonCase(slpInfo!.getSlpAction(), txid);
+                            }
+                            break;
+                        case SlpAction.SLP_V1_MINT:
+                            if (slpInfo?.getV1Mint()!.getMintBatonVout()! > txn.getTransaction()!.getOutputsList().length-1)  {
+                                Logger.AddBurnedMintBatonCase(slpInfo!.getSlpAction(), txid);
+                            }
+                            break;
                         }
                     }
                 }
