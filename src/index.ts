@@ -7,6 +7,7 @@ import { SlpIndexerClient } from "./interface";
 
 import { BchdClient } from "./indexers/bchd";
 import { BitcoinComSlpIdexerClient } from "./indexers/bitcoincom";
+import { BitcoinVerdeIndexerClient } from "./indexers/verde";
 import { GsppTrustedValidationClient } from "./indexers/gs++tv";
 import { SlpdbClient } from "./indexers/slpdb";
 import { Logger } from "./log";
@@ -36,6 +37,13 @@ if (! process.env.BITCOINCOM_URL) {
     console.log("[WARN] missing bitcoin.com indexer, bitcoin.com indexer will not be checked.");
 } else {
     indexers = indexers.concat(BitcoinComSlpIdexerClient);
+}
+
+// check Bitcoin Verde
+if (! process.env.VERDE_URL) {
+    console.log("[WARN] missing Bitcoin Verde indexer, this indexer will be skipped")
+} else {
+    indexers = indexers.concat(BitcoinVerdeIndexerClient);
 }
 
 if (indexers.length < 2) {
