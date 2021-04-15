@@ -130,7 +130,7 @@ const compareIndexersForBlock = async (blockIndex: number) => {
 
                     // we'll ignore NFT group token burns for NFT children
                     if (flag === SlpTransactionInfo.BurnFlags.BURNED_INPUTS_OTHER_TOKEN &&
-                        slpAction === SlpAction.SLP_NFT1_UNIQUE_CHILD_GENESIS &&
+                        slpAction === SlpAction.SLP_V1_NFT1_UNIQUE_CHILD_GENESIS &&
                         isValidSlp &&
                         txn.getTransaction()!.getInputsList().filter(i => i.getSlpToken() ? true : false).length === 1) {
                             continue;

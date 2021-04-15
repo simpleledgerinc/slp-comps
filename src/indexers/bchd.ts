@@ -1,4 +1,4 @@
-import { GetTrustedSlpValidationResponse, GrpcClient } from "grpc-bchrpc-node";
+import { GetSlpTrustedValidationResponse, GrpcClient } from "grpc-bchrpc-node";
 import { SlpIndexerClient } from "../interface";
 
 class _BchdClient implements SlpIndexerClient {
@@ -13,7 +13,7 @@ class _BchdClient implements SlpIndexerClient {
     });
 
     public async validity(txid: string): Promise<{ validity: boolean, invalidReason?: string }> {
-        let res: GetTrustedSlpValidationResponse;
+        let res: GetSlpTrustedValidationResponse;
         try {
             res = await this.client.getTrustedSlpValidation({
                 txos: [{ hash: txid, vout: 1 }],
